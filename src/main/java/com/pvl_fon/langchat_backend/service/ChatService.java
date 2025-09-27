@@ -9,17 +9,22 @@ import dev.langchain4j.model.openai.OpenAiChatModel;
 import dev.langchain4j.model.chat.ChatModel;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
 @Service
 public class ChatService {
+
+    final int DEFAULT_TIMEOUT_SECONDS = 60;
+
     public String chat(ChatRequest request){
         String apiKey = System.getenv("OPENAI_API_KEY");
 
         ChatModel model = OpenAiChatModel.builder()
                 .apiKey(apiKey)
                 .modelName(request.getModel())
+                .timeout(Duration.ofSeconds(DEFAULT_TIMEOUT_SECONDS))
                 .build();
 
         List<ChatMessage> messages = new ArrayList<>();
@@ -28,6 +33,6 @@ public class ChatService {
 
         ChatResponse response = model.chat(messages);
 
-        return response.toString();
+        return response.aiMessage().text();
     }
 }
