@@ -1,4 +1,4 @@
-package com.pvl_fon.langchat;
+package com.pvl_fon.langchat_backend;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

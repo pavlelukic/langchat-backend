@@ -1,4 +1,4 @@
-package com.pvl_fon.langchat;
+package com.pvl_fon.langchat_backend;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

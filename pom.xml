@@ -11,7 +11,7 @@
 	<groupId>com.pvl-fon</groupId>
 	<artifactId>langchat-backend</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>langchat</name>
+	<name>langchat-backend</name>
 	<description>Customizable Chatbot App</description>
 	<url/>
 	<licenses>
