@@ -20,7 +20,6 @@ public class ChatService {
         ChatModel model = OpenAiChatModel.builder()
                 .apiKey(apiKey)
                 .modelName(request.getModel())
-                .temperature(0.7)
                 .build();
 
         List<ChatMessage> messages = new ArrayList<>();
