@@ -9,7 +9,7 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.pvl-fon</groupId>
-	<artifactId>langchat</artifactId>
+	<artifactId>langchat-backend</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>langchat</name>
 	<description>Customizable Chatbot App</description>
