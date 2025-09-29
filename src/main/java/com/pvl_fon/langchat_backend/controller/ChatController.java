@@ -25,7 +25,7 @@ public class ChatController {
         try{
             log.info("Calling chat service...");
             String reply = chatService.chat(request);
-            log.info("Reply received successfully!");
+            log.info("Reply received successfully! Sending response to the client...");
             return new ChatResponse(reply);
         } catch (Exception ex){
             log.error("Error processing message: " + ex.getMessage());

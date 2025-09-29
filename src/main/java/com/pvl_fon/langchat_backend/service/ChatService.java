@@ -16,7 +16,7 @@ import java.util.List;
 @Service
 public class ChatService {
 
-    final int DEFAULT_TIMEOUT_SECONDS = 60;
+    final int DEFAULT_TIMEOUT_SECONDS = 90;
 
     public String chat(ChatRequest request){
         String apiKey = System.getenv("OPENAI_API_KEY");
