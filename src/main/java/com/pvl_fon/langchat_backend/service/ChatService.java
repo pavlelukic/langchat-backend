@@ -10,15 +10,16 @@ import dev.langchain4j.model.chat.response.ChatResponse;
 import dev.langchain4j.model.openai.OpenAiChatModel;
 import dev.langchain4j.model.chat.ChatModel;
 import dev.langchain4j.model.openai.OpenAiTokenCountEstimator;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Service
+@Slf4j
 public class ChatService {
 
     private final Map<String, ChatMemory> memories = new ConcurrentHashMap<>();
@@ -56,5 +57,12 @@ public class ChatService {
         chatMemory.add(response.aiMessage());
 
         return response.aiMessage().text();
+    }
+
+    public void clearMemory(String modelName){
+        if(modelName != null && memories.containsKey(modelName)) {
+            memories.remove(modelName);
+            log.info("Cleared memory for model: " + modelName);
+        }
     }
 }

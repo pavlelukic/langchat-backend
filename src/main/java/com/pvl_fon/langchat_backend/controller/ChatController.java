@@ -2,8 +2,11 @@ package com.pvl_fon.langchat_backend.controller;
 
 import com.pvl_fon.langchat_backend.dto.ChatRequest;
 import com.pvl_fon.langchat_backend.dto.ChatResponse;
+import com.pvl_fon.langchat_backend.dto.ClearRequest;
 import com.pvl_fon.langchat_backend.service.ChatService;
+import dev.langchain4j.model.output.Response;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -34,5 +37,12 @@ public class ChatController {
         }
 
     }
+
+    @PostMapping("/clear")
+    public ResponseEntity<Void> clearMemory(@RequestBody ClearRequest request) {
+        chatService.clearMemory(request.getModel());
+        return ResponseEntity.ok().build();
+    }
+
 
 }
