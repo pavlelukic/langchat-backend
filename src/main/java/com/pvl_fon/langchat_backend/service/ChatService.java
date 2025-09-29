@@ -14,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -33,17 +34,6 @@ public class ChatService {
                 TokenWindowChatMemory.withMaxTokens(2000, new OpenAiTokenCountEstimator(modelName))
         );
 
-        List<ChatMessage> currentMessages = chatMemory.messages();
-
-        boolean updateSystemMessage = currentMessages.isEmpty() ||
-                !(currentMessages.get(0) instanceof SystemMessage) ||
-                !((SystemMessage) currentMessages.get(0)).text().equals(request.getSystemPrompt());
-
-        if(updateSystemMessage) {
-            chatMemory.clear();
-            chatMemory.add(SystemMessage.from(request.getSystemPrompt()));
-        }
-
         chatMemory.add(UserMessage.from(request.getMessage()));
 
         ChatModel model = OpenAiChatModel.builder()
@@ -52,7 +42,12 @@ public class ChatService {
                 .timeout(Duration.ofSeconds(DEFAULT_TIMEOUT_SECONDS))
                 .build();
 
-        ChatResponse response = model.chat(chatMemory.messages());
+        List<ChatMessage> messagesToSend = new ArrayList<>();
+
+        messagesToSend.add(SystemMessage.from(request.getSystemPrompt()));
+        messagesToSend.addAll(chatMemory.messages());
+
+        ChatResponse response = model.chat(messagesToSend);
 
         chatMemory.add(response.aiMessage());
 
