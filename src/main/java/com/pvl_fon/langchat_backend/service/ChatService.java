@@ -4,22 +4,46 @@ import com.pvl_fon.langchat_backend.dto.ChatRequest;
 import dev.langchain4j.data.message.ChatMessage;
 import dev.langchain4j.data.message.SystemMessage;
 import dev.langchain4j.data.message.UserMessage;
+import dev.langchain4j.memory.ChatMemory;
+import dev.langchain4j.memory.chat.TokenWindowChatMemory;
 import dev.langchain4j.model.chat.response.ChatResponse;
 import dev.langchain4j.model.openai.OpenAiChatModel;
 import dev.langchain4j.model.chat.ChatModel;
+import dev.langchain4j.model.openai.OpenAiTokenCountEstimator;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 public class ChatService {
+
+    private final Map<String, ChatMemory> memories = new ConcurrentHashMap<>();
 
     final int DEFAULT_TIMEOUT_SECONDS = 90;
 
     public String chat(ChatRequest request){
         String apiKey = System.getenv("OPENAI_API_KEY");
+
+        ChatMemory chatMemory = memories.computeIfAbsent(request.getModel(), modelName ->
+                TokenWindowChatMemory.withMaxTokens(2000, new OpenAiTokenCountEstimator(modelName))
+        );
+
+        List<ChatMessage> currentMessages = chatMemory.messages();
+
+        boolean updateSystemMessage = currentMessages.isEmpty() ||
+                !(currentMessages.get(0) instanceof SystemMessage) ||
+                !((SystemMessage) currentMessages.get(0)).text().equals(request.getSystemPrompt());
+
+        if(updateSystemMessage) {
+            chatMemory.clear();
+            chatMemory.add(SystemMessage.from(request.getSystemPrompt()));
+        }
+
+        chatMemory.add(UserMessage.from(request.getMessage()));
 
         ChatModel model = OpenAiChatModel.builder()
                 .apiKey(apiKey)
@@ -27,11 +51,9 @@ public class ChatService {
                 .timeout(Duration.ofSeconds(DEFAULT_TIMEOUT_SECONDS))
                 .build();
 
-        List<ChatMessage> messages = new ArrayList<>();
-        messages.add(SystemMessage.from(request.getSystemPrompt()));
-        messages.add(UserMessage.from(request.getMessage()));
+        ChatResponse response = model.chat(chatMemory.messages());
 
-        ChatResponse response = model.chat(messages);
+        chatMemory.add(response.aiMessage());
 
         return response.aiMessage().text();
     }
